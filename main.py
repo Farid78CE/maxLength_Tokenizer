@@ -5,7 +5,7 @@ import time
 
 
 class Util:
-    def listToDictionary(self, lst:list):
+    def listToDictionary(self, lst: list):
         dictionary = {lst[i]: 0 for i in range(0, len(lst))}
         dictionary_copy = self.removeBackSlashN(dictionary)
         # print(dictionary_copy)
@@ -20,9 +20,11 @@ class Util:
             dictionary_copy[str] = 0
         return dictionary_copy
 
+
 class Tokenizer:
     counter: int = 1
-    flag:bool = False
+    flag: bool = False
+
     def readFile(self, language):
         current: str = ""
         current = os.getcwd()
@@ -76,44 +78,79 @@ class Tokenizer:
 
         for index, word in enumerate(listOfFarsiWords):
             temp = listOfFarsiWords[index].strip()
-
+            temp = "".join([i for i in temp if not i.isdigit()])
             listOfFarsiWords[index] = temp
 
-        print(listOfFarsiWords)
-        time.sleep(10.0)
         for index, word in enumerate(listOfEnglishWords):
             temp = listOfEnglishWords[index].strip()
             listOfEnglishWords[index] = temp
 
-        print(listOfEnglishWords)
-        time.sleep(10.0)
-        print(listOfFarsiWords)
+        # print(listOfEnglishWords)
+        # time.sleep(10.0)
+        # print(listOfFarsiWords)
 
-        word:str = ""
-        maxLength:list = []
+        word: str = ""
+        maxLength: list = []
         chosenWord: str = []
-        savedIndex:int = 0
-
+        savedIndex: int = 0
+        counter: int = 0
+        tokenizedString: str = ""
+        tempChar = ""
+        tokenizedList: list = []
         for eachMergedPharase in listOfEnglishMergedWords:
             eachMergedPharase = eachMergedPharase.strip()
             while (True):
-                for index, chars in enumerate(eachMergedPharase):
-                    word += chars
-                    lst = englishDictionary.keys()
-                    # print(type(lst))
 
-                    if englishDictionary.keys().count(word) > 0:
-                        print(englishDictionary[word])
-                        maxLength.append(word)
-                        savedIndex = index
+                word += eachMergedPharase[counter]
 
-                    if savedIndex == index:
+                if word in listOfEnglishWords:
+                    maxLength.append(word)
+
+                if counter == len(eachMergedPharase) - 1:
+                    try:
+                        chosen = max(maxLength)
+                        eachMergedPharase = eachMergedPharase.replace(chosen, "")
+                        tokenizedString = tokenizedString + chosen + " "
                         word = ""
+                        counter = -1
+                        maxLength = []
+                    except Exception as e:
+                        print(str(e))
+                        print("Empty max ")
+                        eachMergedPharase = eachMergedPharase.replace(word, "")
 
-                    if (index == len(eachMergedPharase) - 1):
-                        chosenWord = max(maxLength) #gives you max item in list
-                        word = ""
+                if len(eachMergedPharase) == 0:
+                    tokenizedList.append(tokenizedString)
+                    counter = 0
+                    word = ""
+                    maxLength = []
+                    tokenizedString = ""
+                    break
 
+                counter += 1
+                # for index, chars in enumerate(eachMergedPharase):
+                #     word += chars
+                #
+                #     if word in listOfEnglishWords:
+                #
+                #         maxLength.append(word)
+                #         savedIndex = index
+                #
+                #
+                #     if (index == len(eachMergedPharase) - 1):
+                #         chosenWord += " " + max(maxLength) #gives you max item in list
+                #         word = ""
+                #
+                #     if savedIndex == index:
+                #         word = ""
+            # print(tokenizedList)
+            # time.sleep(2.0)
+
+        print(str(tokenizedList))
+        englishFile = open(os.getcwd() + "\\97463130_Assignment2_EN", "a", encoding="utf8")
+        for i in range(0, len(tokenizedList)):
+            englishFile.write(str(tokenizedList[i]) + "\n")
+        englishFile.close()
 
 
 if __name__ == '__main__':
@@ -127,4 +164,4 @@ if __name__ == '__main__':
     # print(listOfEnglishMergedPharases)
     # print(listOfFarsiMergedPharases)
 
-    tokenizer.tokenize(listOfFarsiWords,listOfEnglishWords,listOfFarsiMergedPharases, listOfEnglishMergedPharases)
+    tokenizer.tokenize(listOfFarsiWords, listOfEnglishWords, listOfFarsiMergedPharases, listOfEnglishMergedPharases)
